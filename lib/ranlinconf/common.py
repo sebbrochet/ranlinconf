@@ -148,7 +148,8 @@ def GetInterfaces(ssh):
 
             interface_line = False
         elif line:
-            result[interface_name].append(line.strip())
+            if not ( line.startswith('RX ') or line.startswith('TX ') or line.startswith('collisions:') ):
+                result[interface_name].append(line.strip())
         else:
             interface_line = True
 
