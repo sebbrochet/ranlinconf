@@ -78,11 +78,9 @@ def manage_cvs_and_notification(server_name, filename):
         EMAIL_FROM = conf_get_IFP(config, "GENERAL", "EMAIL_FROM", "")
         EMAIL_TO = conf_get_IFP(config, "GENERAL", "EMAIL_TO", "")
 
-        if not '@' in EMAIL_FROM or not '@' in EMAIL_TO:
-            return
-
-        for email_to in EMAIL_TO.split(";"):
-            send_mail(EMAIL_FROM, email_to.strip(), "New server: %s" % server_name, body)
+        if '@' in EMAIL_FROM and '@' in EMAIL_TO:
+            for email_to in EMAIL_TO.split(";"):
+                send_mail(EMAIL_FROM, email_to.strip(), "New server: %s" % server_name, body)
     else:
         try:
             check_output(["cvs", "diff", "-u", "%s" % filename])
@@ -93,11 +91,9 @@ def manage_cvs_and_notification(server_name, filename):
             EMAIL_FROM = conf_get_IFP(config, "GENERAL", "EMAIL_FROM", "")
             EMAIL_TO = conf_get_IFP(config, "GENERAL", "EMAIL_TO", "")
 
-            if not '@' in EMAIL_FROM or not '@' in EMAIL_TO:
-                return
-
-            for email_to in EMAIL_TO.split(";"):
-                send_mail(EMAIL_FROM, email_to.strip(), "Changes detected for: %s" % server_name, body)
+            if '@' in EMAIL_FROM and '@' in EMAIL_TO:
+                for email_to in EMAIL_TO.split(";"):
+                    send_mail(EMAIL_FROM, email_to.strip(), "Changes detected for: %s" % server_name, body)
         else:
             pass
 
@@ -117,6 +113,17 @@ def manage_svn_and_notification(server_name, filename):
             output = subprocess.check_call(["svn", "add", "%s" % filename])
         except subprocess.CalledProcessError, e:
             print "%s" % e
+
+        print "New file %s" % filename
+        modif = file(filename, "r").readlines()
+        body = ''.join(modif)
+        EMAIL_FROM = conf_get_IFP(config, "GENERAL", "EMAIL_FROM", "")
+        EMAIL_TO = conf_get_IFP(config, "GENERAL", "EMAIL_TO", "")
+
+        if '@' in EMAIL_FROM and '@' in EMAIL_TO:
+            for email_to in EMAIL_TO.split(";"):
+                send_mail(EMAIL_FROM, email_to.strip(), "New server: %s" % server_name, body)
+
     elif "M " in output:
         output = check_output(["svn", "diff", "%s" % filename])
         print "Modifications detected for %s" % filename
@@ -125,13 +132,11 @@ def manage_svn_and_notification(server_name, filename):
         EMAIL_FROM = conf_get_IFP(config, "GENERAL", "EMAIL_FROM", "")
         EMAIL_TO = conf_get_IFP(config, "GENERAL", "EMAIL_TO", "")
 
-        if not '@' in EMAIL_FROM or not '@' in EMAIL_TO:
-            return
-
-        try:
-            send_mail(EMAIL_FROM, EMAIL_TO, "Changes detected for: %s" % server_name, body)
-        except Exception, e:
-            print "Sending mail has failed, please check value of MTA_SERVER in the configuration file."
+        if '@' in EMAIL_FROM and '@' in EMAIL_TO:
+            try:
+                send_mail(EMAIL_FROM, EMAIL_TO, "Changes detected for: %s" % server_name, body)
+            except Exception, e:
+                print "Sending mail has failed, please check value of MTA_SERVER in the configuration file."
     else:
         pass
 
