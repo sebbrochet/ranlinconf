@@ -98,11 +98,10 @@ def GetCPU(ssh):
         cpu_key = "CPU%d" % cpu
         CPU_dict[cpu_key] = [
             result["%s_name" % cpu_key],
-            "%s Family %s Model %s Stepping %s @ %s MHz" % (result["%s_id" % cpu_key],
+            "%s Family %s Model %s Stepping %s" % (result["%s_id" % cpu_key],
                                                             result["%s_family" % cpu_key],
                                                             result["%s_model" % cpu_key],
-                                                            result["%s_stepping" % cpu_key],
-                                                            result["%s_mhz" % cpu_key])
+                                                            result["%s_stepping" % cpu_key])
     ]
 
     return CPU_dict
